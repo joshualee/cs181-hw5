@@ -32,12 +32,64 @@ def get_target(score):
 
   return PI[score]
 
+def get_wedge_location(wedge):
+  return throw.wedges.index(wedge)
+
+def get_adj_wedge(wedge, i):
+  w_loc = get_wedge_location(wedge)
+  return throw.wedges[(w_loc + i) % throw.NUM_WEDGES]
+
 # define transition matrix/ function
-def T(a, s, s_prime):
+def T(a, s, s_prime):  
   # takes an action a, current state s, and next state s_prime
   # returns the probability of transitioning to s_prime when taking action a in state s
-  return 0
+  target = s - s_prime
+  target_locations = []
+  p = 0.0
+  
+  # find all wedge/ring combos that would lead to s -> s' transition
+  for i in range(-2, 3):
+    current_wedge = get_adj_wedge(a.wedge, i)
+    
+    # iterate through all possible rings
+    for j in range(-2, 3):
+      ring = a.ring + j
+      
+      # off dart board
+      if ring >= throw.MISS:
+        continue
+      
+      # allow for ring "wrap around", e.g. the ring inside and outside the center
+      # ring is the inner ring
+      if ring < 0:
+        ring = abs(ring)
+        
+      new_location = throw.location(ring, current_wedge)
+      
+      # hitting target would go from s -> s'!
+      if target == throw.location_to_score(new_location):
+        # calculate probability of hitting target
+        if i == 0:
+          w_p = 0.4
+        elif abs(i) == 1 :
+          w_p = 0.2
+        elif abs(i) == 2:
+          w_p = 0.1
+        else:
+          assert False, "Impossible wedge"
 
+        if j == 0:
+          r_p = 0.4
+        elif abs(j) == 1 :
+          r_p = 0.2
+        elif abs(j) == 2:
+          r_p = 0.1
+        else:
+          assert False, "Impossible ring"
+        
+        p += (w_p * r_p)
+  
+  return p
 
 def infiniteValueIteration(gamma):
   # takes a discount factor gamma and convergence cutoff epislon
@@ -78,6 +130,10 @@ def infiniteValueIteration(gamma):
 
       # given current state, store the action that maximizes V in pi and the corresponding value in V
       PI[s] = actions[0]
+      
+      # bug fix from piazza post 283
+      V[s] = Q[s][PI[s]] 
+      
       for a in actions:
         if V[s] <= Q[s][a]:
           V[s] = Q[s][a]
@@ -87,5 +143,3 @@ def infiniteValueIteration(gamma):
     for s in states:
       if abs(V[s] - V_prime[s]) > EPSILON:
         notConverged = True
-        
-  

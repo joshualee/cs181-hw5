@@ -1,6 +1,7 @@
 import random
 import throw
 import darts
+import math
 
 EPSILON_VI = .001
 
@@ -20,16 +21,50 @@ def get_target(score):
   return(throw.location(throw.INNER_RING, throw.NUM_WEDGES))
 
 
+def exp_cooling_function(t):
+  return 50.0 * pow(math.e, -t / 250.0)
+
 # Define your first exploration/exploitation strategy here. Return 0 to exploit and 1 to explore. 
 # You may want to pass arguments from the modelbased function. 
-def ex_strategy_one():
-  return 0
+def ex_strategy_one(actions, pi_star, s, trials):
+  epsilon = 1.0 / trials
+  u = random.uniform(0, 1)
+  if u <= epsilon:
+    # explore
+    return random.randint(0, len(actions)-1)
+  else:
+    # exploit
+    return pi_star[s]
 
 # Define your first exploration/exploitation strategy here. Return 0 to exploit and 1 to explore. 
 # You may want to pass arguments from the modelbased function.
-def ex_strategy_two():
-  return 1
-
+def ex_strategy_two(actions, Q, s, trials):
+  # uniformly choose random action if we have not estimated Q yet
+  if Q == {}:
+    return random.randint(0, len(actions)-1)
+  
+  # calculate probabilities according to Boltzmann exploration
+  temp = exp_cooling_function(trials)
+  p = {}
+  total_p = 0.0
+  for a in range(len(actions)):
+    p[a] = pow(math.e, Q[s][a] / temp)
+    total_p += p[a]
+  
+  # normalize the probability
+  for a in range(len(actions)):
+    p[a] = p[a] / total_p
+  
+  # random draw
+  u = random.uniform(0, 1)
+  
+  # pick action a with probability p[a]
+  current_p = 0.0
+  for a in range(len(actions)):
+    current_p += p[a]
+    if u < current_p:
+      return a
+      
 # Implement a model-based reinforcement learning algorithm. 
 # Given num_games (the number of games to play), store the
 # learned transition probabilities in T.
@@ -67,28 +102,21 @@ def modelbased(gamma, epoch_size, num_games):
 
     # play num_games games, updating policy after every EPOCH_SIZE number of throws
     for g in range(1, num_games + 1):
+        iterations_this_game = 0
+        Q = {}
     
     	# run a single game
         s = throw.START_SCORE
         while s > 0:
-
+            iterations_this_game += 1
             num_iterations += 1
     		
             # The following two statements implement two exploration-exploitation
             # strategies. Comment out the strategy that you wish not to use.
-			
-    	    #to_explore = ex_strategy_one()
-    	    to_explore = ex_strategy_two()
-    		
-            if to_explore:
-            	# explore
-            	a = random.randint(0, len(actions)-1)
-            	action = actions[a]
-            else:
-            	# exploit
-            	a = pi_star[s]
-            	action = actions[a]
-    
+            
+            # a = ex_strategy_one(actions, pi_star, s, iterations_this_game)
+            a = ex_strategy_two(actions, Q, s, iterations_this_game)
+            action = actions[a]
             
             # Get result of throw from dart thrower; update score if necessary
             loc = throw.throw(action) 
@@ -120,24 +148,21 @@ def modelbased(gamma, epoch_size, num_games):
 
                 # Update strategy (stored in pi) based on newly updated reward function and transition
                 # probabilities 
-                T_matrix, pi_star = modelbased_value_iteration(gamma, T_matrix, pi_star)
+                T_matrix, pi_star, Q = modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states)
     
-    print "Average turns = ", float(num_iterations)/float(num_games)
+    avg_turns = float(num_iterations)/float(num_games)
+    print "Average turns = ", avg_turns
+    return avg_turns
 
 
 # A modified version of infinite horizon value iteration from part 2 */
-def modelbased_value_iteration(gamma, T_matrix, pi_star):
+def modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states):
   V = {}
   V[0] = {}
   V[1] = {}
   converging = 0
   num_iterations = 0
   Q = {}
-
-  # Get all possible actions
-  actions = darts.get_actions()
-
-  states = darts.get_states()
 
   # initialize v
   for s in states:
@@ -148,18 +173,19 @@ def modelbased_value_iteration(gamma, T_matrix, pi_star):
   while not(converging):
     num_iterations += 1
     for s in states:
+      Q[s] = {}
       for a in range(len(actions)):
 
         # find the value of each action, given state s 
-        Q[a] = darts.R(s, actions[a])
+        Q[s][a] = darts.R(s, actions[a])
         for s_prime in states:
 
-          Q[a] += gamma * T_matrix[s][s_prime][a] * V[0][s_prime]
+          Q[s][a] += gamma * T_matrix[s][s_prime][a] * V[0][s_prime]
 
           # find the action that maximizes Q and the maximum value of Q
-          if a == 0 or (Q[a] >= V[1][s]):
+          if a == 0 or (Q[s][a] >= V[1][s]):
             pi_star[s] = a
-            V[1][s] = Q[a]
+            V[1][s] = Q[s][a]
 
                   
     # values of v for iteration k become the values of v for iteration k-1
@@ -171,6 +197,6 @@ def modelbased_value_iteration(gamma, T_matrix, pi_star):
 
       V[0][s] = V[1][s]
 
-  return T_matrix, pi_star
+  return T_matrix, pi_star, Q
 
   

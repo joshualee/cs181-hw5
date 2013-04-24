@@ -89,7 +89,6 @@ def modelbased(gamma, epoch_size, num_games):
       V[0][s] = 0
       V[1][s] = 0
     
-    
     # Initialize all arrays to 0 except the policy, which should be assigned a random action for each state.
     for s in states:
         pi_star[s] = random.randint(0, len(actions)-1)

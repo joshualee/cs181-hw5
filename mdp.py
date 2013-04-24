@@ -19,12 +19,32 @@ PI = {}
 EPSILON = .001
 
 
+def print_policy(PI):
+  for ele in PI:
+    print "score: {0}; {1}; wedge: {2}".format(ele, ring_to_str(PI[ele].ring),PI[ele].wedge)
+
+def ring_to_str(ring):
+  if ring == 0:
+    return "center"
+  elif ring == 1:
+    return "inner ring"
+  elif ring == 2:
+    return "first patch"
+  elif ring == 3:
+    return "middle ring"
+  elif ring == 4:
+    return "second patch"
+  elif ring == 5:
+    return "outer ring"
+  elif ring == 6:
+    return "miss"
+
 # actual
 def start_game(gamma):
 
   infiniteValueIteration(gamma)
-  #for ele in PI:
-    #print "score: ", ele, "; ring: ", PI[ele].ring, "; wedge: ", PI[ele].wedge
+  
+  print_policy(PI)
   
   return PI[throw.START_SCORE]
 
@@ -39,8 +59,15 @@ def get_adj_wedge(wedge, i):
   w_loc = get_wedge_location(wedge)
   return throw.wedges[(w_loc + i) % throw.NUM_WEDGES]
 
+T_cached = {}
+
 # define transition matrix/ function
-def T(a, s, s_prime):  
+def T(a, s, s_prime):
+  global T_cached
+  
+  if (a, s, s_prime) in T_cached:
+    return T_cached[(a, s, s_prime)]
+    
   # takes an action a, current state s, and next state s_prime
   # returns the probability of transitioning to s_prime when taking action a in state s
   target = s - s_prime
@@ -88,7 +115,8 @@ def T(a, s, s_prime):
           assert False, "Impossible ring"
         
         p += (w_p * r_p)
-  
+        
+  T_cached[(a, s, s_prime)] = p
   return p
 
 def infiniteValueIteration(gamma):

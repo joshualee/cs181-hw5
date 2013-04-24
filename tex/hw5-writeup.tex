@@ -46,7 +46,87 @@ So, this utility function does well at the beginning of the game, when you are s
 
 We write a reward function $R(s, a)$ that represents the expected number of points you receive by taking action $a$ in state $s$. We use expected number of points because the number of points (i.e. reward) you get depends on the state $s'$ that you actually end up in. \\ 
 
-The discount factor plays two roles. First it represents how much we value future reward. The closer $\gamma$ is to one, the more we value future reward. Second, it determines how fast our value iteration algorithm will converge. The closer $\gamma$ is to zero, the faster it will converge.
+The discount factor plays two roles. First it represents how much we value future reward. The closer $\gamma$ is to one, the more we value future reward. Second, it determines how fast our value iteration algorithm will converge. The closer $\gamma$ is to zero, the faster it will converge. \\
+
+\section{2e}
+
+\textbf{Policy (small game, $\gamma = 0.5$)}
+\begin{verbatim}
+score: 0; outer ring; wedge: 3
+score: 1; second patch; wedge: 1
+score: 2; second patch; wedge: 2
+score: 3; middle ring; wedge: 1
+score: 4; second patch; wedge: 4
+score: 5; inner ring; wedge: 4
+score: 6; inner ring; wedge: 2
+score: 7; inner ring; wedge: 2
+score: 8; middle ring; wedge: 2
+score: 9; middle ring; wedge: 3
+\end{verbatim}
+
+We see for states $1, 2, 3, 4, 5, 9$ that our policy attempts to end the game in a single additional throw (e.g. in state 9 we aim for a target that would give 9 points). This intuitively makes sense as the optimal since our goal is to minimize the number of throws. For state 7, we note there is no single throw that gives us 7 points, so it makes sense that we aim for another amount (in this case 5) that gets us close to 0. \\
+
+However we note for states 6 and 8, we do not attempt to end the game in one throw, even though we could (we go for triple three for 6 points or double four for 8 points). We guess that this is because the wedges and rings surrounding these targets gave little or no reward. Since our actual reward takes into the account that our throw is noisy, it is possible that in expectation, these were actually not the optimal targets.
+
+\section{2f}
+
+\textbf{Policy (small game, $\gamma = 0.99$)}
+\begin{verbatim}
+score: 0; outer ring; wedge: 3
+score: 1; second patch; wedge: 1
+score: 2; second patch; wedge: 2
+score: 3; second patch; wedge: 1
+score: 4; second patch; wedge: 1
+score: 5; inner ring; wedge: 1
+score: 6; middle ring; wedge: 2
+score: 7; middle ring; wedge: 2
+score: 8; middle ring; wedge: 2
+score: 9; middle ring; wedge: 3
+\end{verbatim}
+
+\textbf{Policy (small game, $\gamma = 0.75$)}
+\begin{verbatim}
+score: 0; outer ring; wedge: 3
+score: 1; second patch; wedge: 1
+score: 2; second patch; wedge: 2
+score: 3; second patch; wedge: 1
+score: 4; second patch; wedge: 1
+score: 5; inner ring; wedge: 1
+score: 6; middle ring; wedge: 2
+score: 7; middle ring; wedge: 2
+score: 8; middle ring; wedge: 2
+score: 9; middle ring; wedge: 3
+\end{verbatim}
+
+\textbf{Policy (small game, $\gamma = 0.25$)}
+\begin{verbatim}
+score: 0; outer ring; wedge: 3
+score: 1; second patch; wedge: 1
+score: 2; second patch; wedge: 2
+score: 3; middle ring; wedge: 1
+score: 4; second patch; wedge: 4
+score: 5; inner ring; wedge: 4
+score: 6; inner ring; wedge: 2
+score: 7; inner ring; wedge: 2
+score: 8; middle ring; wedge: 2
+score: 9; middle ring; wedge: 3
+\end{verbatim}
+
+\textbf{Policy (small game, $\gamma = 0$)}
+\begin{verbatim}
+score: 0; outer ring; wedge: 3
+score: 1; second patch; wedge: 1
+score: 2; second patch; wedge: 2
+score: 3; middle ring; wedge: 1
+score: 4; second patch; wedge: 4
+score: 5; inner ring; wedge: 4
+score: 6; inner ring; wedge: 2
+score: 7; inner ring; wedge: 2
+score: 8; inner ring; wedge: 2
+score: 9; middle ring; wedge: 3
+\end{verbatim}
+
+\textbf{TODO:} Write about the changes in the policy and what stays the same.
 
 \end{document}
 

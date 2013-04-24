@@ -10,7 +10,7 @@ import mdp
 import modelbased
 import modelfree
 
-GAMMA = .5
+GAMMA = 0.5
 EPOCH_SIZE = 10
 
 
@@ -106,8 +106,8 @@ def main():
 #*************************************************
 
 # Default is to solve MDP and play 1 game
-    # throw.use_simple_thrower()
-    # test(100, "mdp")    
+    throw.use_simple_thrower()
+    test(100, "mdp")    
 
 #*************************************************#
 # Uncomment the lines below to run the modelbased #
@@ -120,13 +120,13 @@ def main():
 # multiple calls to main().
 # Then, initialize the throwing model and run
 # the modelbased algorithm.
-    random.seed(181)
-    throw.init_thrower()
-    f = open("q4a_data_strat1.csv", "w")
-    f.write("EPOCH_SIZE, AVG_TURNS\n")
-    # for epoch in ([1] + range(5, 51, 5)):    
-    avg_turns = modelbased.modelbased(GAMMA, 1, 2)
-    f.write("{0}, {1}\n".format(1, avg_turns))
+    # random.seed(181)
+    # throw.init_thrower()
+    # f = open("q4a_data_strat1.csv", "w")
+    # f.write("EPOCH_SIZE, AVG_TURNS\n")
+    # # for epoch in ([1] + range(5, 51, 5)):    
+    # avg_turns = modelbased.modelbased(GAMMA, 1, 2)
+    # f.write("{0}, {1}\n".format(1, avg_turns))
 
 #*************************************************#
 # Uncomment the lines below to run the modelfree  #

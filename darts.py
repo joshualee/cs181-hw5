@@ -41,11 +41,8 @@ def R(s,a):
   # takes a state s and action a
   # returns the reward for completing action a in state s
   reward = 0.0
-  for i in range(s):
-    score = throw.location_to_score(a)
-    if score <= s:
-      reward += mdp.T(a, s, s - score) * score  
-  
+  for s_prime in range(s):
+    reward += mdp.T(a, s, s_prime) * (s - s_prime)
   return reward
 
 

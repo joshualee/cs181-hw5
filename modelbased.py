@@ -175,7 +175,7 @@ def modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states, V):
       for a in range(len(actions)):
 
         # find the value of each action, given state s 
-        Q[s][a] = darts.R(s, actions[a])
+        Q[s][a] = darts.R_simple(s, actions[a])
         for s_prime in states:
 
           Q[s][a] += gamma * T_matrix[s][s_prime][a] * V[0][s_prime]

@@ -45,6 +45,13 @@ def R(s,a):
     reward += mdp.T(a, s, s_prime) * (s - s_prime)
   return reward
 
+def R_simple(s,a):
+  # takes a state s and action a
+  # returns the reward for completing action a in state s
+  points = location_to_score(a)
+  if points <= s:
+      return points
+  return 0
 
 # Play a single game 
 def play(method):

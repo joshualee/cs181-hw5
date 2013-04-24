@@ -106,8 +106,8 @@ def main():
 #*************************************************
 
 # Default is to solve MDP and play 1 game
-    throw.use_simple_thrower()
-    test(100, "mdp")    
+    # throw.use_simple_thrower()
+    # test(100, "mdp")    
 
 #*************************************************#
 # Uncomment the lines below to run the modelbased #
@@ -125,7 +125,7 @@ def main():
     # f = open("q4a_data_strat1.csv", "w")
     # f.write("EPOCH_SIZE, AVG_TURNS\n")
     # # for epoch in ([1] + range(5, 51, 5)):    
-    # avg_turns = modelbased.modelbased(GAMMA, 1, 2)
+    # avg_turns = modelbased.modelbased(GAMMA, 5, 10)
     # f.write("{0}, {1}\n".format(1, avg_turns))
 
 #*************************************************#
@@ -135,9 +135,9 @@ def main():
 
 # Plays 1 game using a default player. No modelfree
 # code is provided. 
-    # random.seed(181)
-    # throw.init_thrower()
-    # test(100, "modelfree")
+    random.seed(181)
+    throw.init_thrower()
+    test(100, "modelfree")
 
 
 if __name__ =="__main__":

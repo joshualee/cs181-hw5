@@ -24,17 +24,21 @@ throws = 0
 
 def start_game():
   global Q, states, actions, cur_s, last_a, throws
-  
-  states = darts.get_states()
-  actions = darts.get_actions()
+
   cur_s = throw.START_SCORE
   throws = 1
   
-  Q = {}
-  for s in states:
-    Q[s] = {}
-    for a in actions:
-      Q[s][a] = 0.0
+  # only initialize states, actions, and Q once
+  if states == None:
+    states = darts.get_states()
+  if actions == None:
+    actions = darts.get_actions()
+
+  if len(Q) == 0:
+    for s in states:
+      Q[s] = {}
+      for a in actions:
+        Q[s][a] = 0.0
   
   # start by returning uniform random action
   last_a = choice(actions)
@@ -59,8 +63,8 @@ def get_target(new_s):
   # update current state
   cur_s = new_s
   
-  # last_a = ex_strategy_one(actions, throws, Q, cur_s)
-  last_a = ex_strategy_two(actions, throws, Q, cur_s)
+  last_a = ex_strategy_one(actions, throws, Q, cur_s)
+  # last_a = ex_strategy_two(actions, throws, Q, cur_s)
   return last_a
 
 def get_argmax_Qsa(Q, s):

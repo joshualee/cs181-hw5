@@ -121,8 +121,8 @@ def modelbased(gamma, epoch_size, num_games):
             # The following two statements implement two exploration-exploitation
             # strategies. Comment out the strategy that you wish not to use.
             
-            # a = ex_strategy_one(actions, pi_star, s, iterations_this_game)
-            a = ex_strategy_two(actions, Q, s, iterations_this_game)
+            a = ex_strategy_one(actions, pi_star, s, iterations_this_game)
+            # a = ex_strategy_two(actions, Q, s, iterations_this_game)
             action = actions[a]
             
             # Get result of throw from dart thrower; update score if necessary

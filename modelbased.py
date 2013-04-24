@@ -81,6 +81,14 @@ def modelbased(gamma, epoch_size, num_games):
     T_matrix = {}
     num_iterations = 0
     
+    # initialize v
+    V = {}
+    V[0] = {}
+    V[1] = {}
+    for s in states:
+      V[0][s] = 0
+      V[1][s] = 0
+    
     
     # Initialize all arrays to 0 except the policy, which should be assigned a random action for each state.
     for s in states:
@@ -148,27 +156,18 @@ def modelbased(gamma, epoch_size, num_games):
 
                 # Update strategy (stored in pi) based on newly updated reward function and transition
                 # probabilities 
-                T_matrix, pi_star, Q = modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states)
+                T_matrix, pi_star, Q, V = modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states, V)
     
     avg_turns = float(num_iterations)/float(num_games)
     print "Average turns = ", avg_turns
     return avg_turns
 
-
 # A modified version of infinite horizon value iteration from part 2 */
-def modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states):
-  V = {}
-  V[0] = {}
-  V[1] = {}
+def modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states, V):
   converging = 0
   num_iterations = 0
   Q = {}
-
-  # initialize v
-  for s in states:
-    V[0][s] = 0
-    V[1][s] = 0
-
+  
   # iterate until all state values (v[s]) converge 
   while not(converging):
     num_iterations += 1
@@ -196,7 +195,5 @@ def modelbased_value_iteration(gamma, T_matrix, pi_star, actions, states):
         converging = False
 
       V[0][s] = V[1][s]
-
-  return T_matrix, pi_star, Q
-
   
+  return T_matrix, pi_star, Q, V

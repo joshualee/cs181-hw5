@@ -9,6 +9,7 @@ import throw
 import mdp
 import modelbased
 import modelfree
+import numpy as np
 
 GAMMA = 0.5
 EPOCH_SIZE = 10
@@ -25,7 +26,7 @@ def get_states():
 def get_actions():
 
   actions = []
-  
+
   for wedge in throw.wedges:
     actions = actions + [throw.location(throw.CENTER, wedge)]
     actions = actions + [throw.location(throw.INNER_RING, wedge)]
@@ -33,7 +34,7 @@ def get_actions():
     actions = actions + [throw.location(throw.MIDDLE_RING, wedge)]
     actions = actions + [throw.location(throw.SECOND_PATCH, wedge)]
     actions = actions + [throw.location(throw.OUTER_RING, wedge)]
-    
+
   return actions
 
 # <CODE HERE>: Define the reward function
@@ -48,21 +49,21 @@ def R(s,a):
 def R_simple(s,a):
   # takes a state s and action a
   # returns the reward for completing action a in state s
-  points = location_to_score(a)
+  points = throw.location_to_score(a)
   if points <= s:
       return points
   return 0
 
-# Play a single game 
+# Play a single game
 def play(method):
     score = throw.START_SCORE
     turns = 0
-    
+
     if method == "mdp":
         target = mdp.start_game(GAMMA)
     else:
         target = modelfree.start_game()
-        
+
     targets = []
     results = []
     while(True):
@@ -87,17 +88,17 @@ def play(method):
             target = mdp.get_target(score)
         else:
             target = modelfree.get_target(score)
-            
+
     print "WOOHOO!  It only took", turns, " turns"
     #end_game(turns)
     return turns
 
-# Play n games and return the average score. 
+# Play n games and return the average score.
 def test(n, method):
     score = 0
     for i in range(n):
         score += play(method)
-        
+
     print "Average turns = ", float(score)/float(n)
     return score
 
@@ -113,8 +114,8 @@ def main():
 #*************************************************
 
 # Default is to solve MDP and play 1 game
-    # throw.use_simple_thrower()
-    # test(100, "mdp")    
+    throw.use_simple_thrower()
+    test(100, "mdp")
 
 #*************************************************#
 # Uncomment the lines below to run the modelbased #
@@ -127,13 +128,13 @@ def main():
 # multiple calls to main().
 # Then, initialize the throwing model and run
 # the modelbased algorithm.
-    # random.seed(181)
-    # throw.init_thrower()
-    # f = open("q4a_data_strat1.csv", "w")
-    # f.write("EPOCH_SIZE, AVG_TURNS\n")
-    # # for epoch in ([1] + range(5, 51, 5)):    
-    # avg_turns = modelbased.modelbased(GAMMA, 5, 10)
-    # f.write("{0}, {1}\n".format(1, avg_turns))
+    random.seed(181)
+    throw.init_thrower()
+    f = open("q4a_data_strat1.csv", "w")
+    f.write("EPOCH_SIZE, AVG_TURNS\n")
+
+    avg_turns = modelbased.modelbased(GAMMA, 5, 100)
+    f.write("{0}, {1}\n".format(1, avg_turns))
 
 #*************************************************#
 # Uncomment the lines below to run the modelfree  #
@@ -141,10 +142,10 @@ def main():
 #*************************************************#
 
 # Plays 1 game using a default player. No modelfree
-# code is provided. 
-    random.seed(181)
-    throw.init_thrower()
-    test(100, "modelfree")
+# code is provided.
+    #random.seed(181)
+    #throw.init_thrower()
+    #test(100, "modelfree")
 
 
 if __name__ =="__main__":
